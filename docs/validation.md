@@ -31,7 +31,7 @@ Tom confirmed that explicit plugin summon opens the intended RSS Feed UI on his 
 
 `python3 test/fetch_security_test.py` covers DNS rebinding, mixed public/private answers, TLS hostname verification, socket cleanup/fallback, malformed URLs, XML entity/depth/byte limits, active markup and output size, malformed and oversized caches, truncated HTTP responses, and a real subprocess deadline with a blocked worker thread. All fixtures are local; they do not depend on publisher uptime.
 
-The complete suite is also available through `tests/run`. The skill release preflight expects that path. Its bundled validator lookup assumes named skill directories; in this environment the skills use hashed package directories. Run the validator directly, or inject its resolved path into `release_preflight.validator_path` without changing the checks. The older validator’s multiselect warning is documented above. The release wrapper promotes this warning to an error, so its overall result is NOT READY; the unmodified Quattro validator passes. Do not label that wrapper result a pass or change the supported setting type merely to suppress its outdated whitelist.
+The complete suite is also available through `tests/run`. During release preparation, the installed skill release preflight could not resolve its validator from renamed skill directories, and strict validation rejected the supported `multiselect` setting. That wrapper result was NOT READY; the unmodified Quattro validator passed. [Build Omarchy Plugins PR #30](https://github.com/tcballard/build-omarchy-plugins/pull/30) prepares both tooling fixes, including an explicit trusted `--validator` path. Its updated strict validator was run against RSS Feed and passed without errors or warnings. The bundle change is pending merge and distribution; it does not retroactively change the original result or certify the plugin.
 
 ## On-device release checks — passed
 
@@ -47,10 +47,23 @@ On 22 September 2026, Tom confirmed that all outstanding on-device checks had pa
 8. Disable during refresh, re-enable, update from Git once published, then remove; confirm processes stop and retained user data remains intact.
 9. Select **F → Window mode → Centred floating** while open, switch back to Tiled, close/reopen, and restart the shell. Confirm the preference persists, only RSS Feed moves, and centring/sizing works on each monitor, including scaling and rotation. Change mode rapidly, close during placement and verify no other window moves. Open the mode dropdown and press Escape: only the dropdown should close first. Repeatedly open in floating mode and confirm there is no initial tiled frame or desktop reflow; repeat after reloading Hyprland.
 
-The upstream PR is still open. Closing or superseding it is a separate action after the independent plugin is accepted; migration is optional for users who want their older settings.
+[Upstream PR #10012](https://github.com/omacom/omarchy/pull/10012) was closed as superseded on 22 September 2026, with links to the standalone plugin and its [migration guide](installation.md). Migration is optional for users who want to preserve their older settings.
 
-## v0.1.0 release preparation
+## Published release and marketplace snapshot
 
-The release preparation PR changes documentation and contribution templates only. Runtime source remains the hardened candidate `aa476b512763188387d638f45cac165176fe61e0`. The full portable suite is rerun on the preparation branch; the PR head and its CI run identify that candidate. The final release SHA will be the merged commit, recorded before tagging.
+[v0.1.0](https://github.com/tcballard/omarchy-plugin-rss-feed/releases/tag/v0.1.0) was published on 22 September 2026 with its annotated tag at `72b3f47dbf62c2d622132ce75835544638c38b9e`.
 
-Marketplace issue [#8069](https://github.com/omacom/omarchy-plugin-marketplace/issues/8069) reports successful Quattro compatibility and automated security baseline checks for `aa476b512763188387d638f45cac165176fe61e0`. This corroborates the supported multiselect schema despite the older local skill's preflight warning. It does not establish approval or validate newer commits.
+The marketplace then published and verified RSS Feed at `48d355253e5e3ce1172366125b3a43dc359ad7d2`, after [PR #3](https://github.com/tcballard/omarchy-plugin-rss-feed/pull/3) removed automatic release publishing. Both Quattro compatibility and the automated security baseline passed for that exact snapshot. [Submission #8069](https://github.com/omacom/omarchy-plugin-marketplace/issues/8069) is closed as completed; the [listing is live](https://plugins.omarchy.org/plugin.html?id=io.github.tcballard.rss-feed).
+
+The release tag and marketplace snapshot differ only in CI and publishing documentation. Runtime source remains the hardened candidate `aa476b512763188387d638f45cac165176fe61e0`. Verification is scoped to the marketplace snapshot and is not a security audit or a claim about newer commits.
+
+## Record with the next on-device check
+
+The completed XPS results above remain valid as maintainer-reported evidence. During the next testing round, record the installed plugin SHA, Omarchy SHA, CPU architecture, theme, and each monitor's scale alongside the actions tested. Do not infer the missing values for the earlier run.
+
+```bash
+git -C ~/.config/omarchy/plugins/io.github.tcballard.rss-feed rev-parse HEAD
+git -C "$OMARCHY_PATH" rev-parse HEAD
+uname -m
+hyprctl monitors -j
+```

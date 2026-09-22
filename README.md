@@ -64,7 +64,7 @@ Removal keeps your cached articles and reading history. See [installation and re
 
 Feeds come directly from their publishers. No analytics, accounts or tracking service. Custom subscriptions need public HTTPS URLs; private-network and authenticated feeds aren't supported. Subscription URLs and cached articles are stored locally in plain text. [Privacy and dependencies →](docs/security.md)
 
-**v0.1.0** is [submitted to the Plugin Store](https://github.com/omacom/omarchy-plugin-marketplace/issues/8069). All on-device release checks passed on my XPS. [Validation details →](docs/validation.md)
+**v0.1.0** is [available in the Omarchy Plugin Store](https://plugins.omarchy.org/plugin.html?id=io.github.tcballard.rss-feed). All on-device release checks passed on my XPS. [Validation details →](docs/validation.md)
 
 [Report a bug](https://github.com/tcballard/omarchy-plugin-rss-feed/issues) · [Feed catalogue](docs/feed-catalog.md) · [Security reporting](SECURITY.md)
 

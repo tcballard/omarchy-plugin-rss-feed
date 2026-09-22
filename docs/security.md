@@ -28,4 +28,4 @@ Caches and subscription URLs are plain text. Do not use secret-bearing feed URLs
 
 ## Review scope
 
-Portable validation and adversarial fixtures are evidence for the tested source, not a security audit or marketplace approval. QML still runs inside the shell with user privileges. Files controlled by the desktop user, theme files and the installed plugin checkout are part of that local trust boundary. Live disable/update/removal behaviour and exact host compatibility remain on the release checklist.
+Portable validation and adversarial fixtures are evidence for the tested source, not a security audit or marketplace approval. QML still runs inside the shell with user privileges. Files controlled by the desktop user, theme files and the installed plugin checkout are part of that local trust boundary. The maintainer completed the live release checklist on his XPS on 22 September 2026, including disable, update and removal. See [validation evidence](validation.md) for the tested scope and the host details still to record. Marketplace verification applies to the published snapshot, not every later commit.
