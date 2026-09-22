@@ -45,4 +45,30 @@ assertEqual(saved.settings.customFeeds, 'https://example.com/rss', 'window-mode 
 assertEqual(saved.settings.feedCollections, '[]', 'window-mode change preserves collections')
 configuration.persistSettings({windowMode:'Tiled'})
 assertEqual(saved.settings.windowMode, 'Tiled', 'returning to tiled replaces the saved preference')
+
+const opening = {
+  opened:false, closingFromHost:false, window:{visible:false}, selectedIndex:0,
+  articles:[], currentArticle:null, news:null, preparingWindow:true, windowModePending:false,
+  markReadTimer:{restart() {}}, windowModeTimer:{restart() {}},
+  focusScope:{forceActiveFocus() {}}, Qt:{callLater(fn) {fn()}},
+  windowModeStderr:{text:'fixture error'}, console:{warn() {}},
+  requestWindowMode() {}
+}
+vm.createContext(opening)
+vm.runInContext('function open(payloadJson) {' + body(panel,'open') + '}\nfunction finish(exitCode) {' + body(panel,'finishWindowMode') + '}', opening)
+opening.open('{}')
+assert(opening.opened && !opening.window.visible, 'opening waits for the initial window rule without mapping a tiled frame')
+opening.windowModePending = true
+opening.finish(0)
+assert(!opening.window.visible, 'a changed preference is prepared before mapping')
+opening.windowModePending = false
+opening.finish(0)
+assert(opening.window.visible, 'successful preparation maps the reader once')
+opening.window.visible = false
+opening.opened = false
+opening.finish(0)
+assert(!opening.window.visible, 'late preparation completion cannot reopen a closed reader')
+opening.opened = true
+opening.finish(1)
+assert(opening.window.visible && opening.windowModeError, 'preparation failure exposes a readable error without a late float')
 JS

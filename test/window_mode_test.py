@@ -11,6 +11,36 @@ spec.loader.exec_module(mode)
 
 
 class WindowModeTests(unittest.TestCase):
+    def test_prepare_installs_static_rule_without_mapping_or_dispatch(self):
+        responses = [json.dumps([self.monitor(focused=True)]), "ok"]
+        with patch.object(mode, "hyprctl", side_effect=responses) as ipc:
+            mode.prepare("Centred floating")
+        self.assertEqual(ipc.call_args_list[0].args, ("-j", "monitors"))
+        operation, rule = ipc.call_args_list[1].args
+        self.assertEqual(operation, "eval")
+        self.assertIn('initial_title = "^RSS Feed$"', rule)
+        self.assertIn('float = true, center = true, size = { 1040, 720 }', rule)
+        self.assertIn('rss_feed_mode_rule:set_enabled(false)', rule)
+        self.assertIn('rss_feed_mode_key == "floating-1040-720"', rule)
+
+    def test_prepare_tiled_needs_no_window_or_monitor_lookup(self):
+        with patch.object(mode, "hyprctl", return_value="ok") as ipc:
+            mode.prepare("Tiled")
+        self.assertEqual(ipc.call_count, 1)
+        self.assertIn('tile = true', ipc.call_args.args[1])
+        self.assertNotIn('float = true', ipc.call_args.args[1])
+
+    def test_prepare_fits_focused_monitor_and_rejects_missing_focus(self):
+        monitors = [self.monitor(id=2, width=3840), self.monitor(focused=True, scale=1.5)]
+        self.assertIn('size = { 1040, 656 }', mode.preparation_rule('Centred floating', monitors))
+        with self.assertRaises(ValueError):
+            mode.preparation_rule('Centred floating', [self.monitor()])
+
+    def test_prepare_reports_compositor_failure(self):
+        with patch.object(mode, 'hyprctl', return_value='Lua error: unavailable'):
+            with self.assertRaises(RuntimeError):
+                mode.prepare('Tiled')
+
     def client(self, **changes):
         return dict({"address": "0x123abc", "pid": 123, "title": "RSS Feed",
                      "mapped": True, "hidden": False, "monitor": 1}, **changes)

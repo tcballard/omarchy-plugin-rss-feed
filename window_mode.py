@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""Apply RSS Feed's window mode to its own mapped Hyprland window."""
+"""Prepare RSS Feed's opening rule or apply a mode to its mapped window."""
 
 import argparse
 import json
@@ -63,6 +63,36 @@ def commands(client, mode, monitors):
             f'hl.dsp.window.center({{ {target} }})']
 
 
+def preparation_rule(mode, monitors):
+    if mode == "Tiled":
+        key, effects = "tiled", "tile = true"
+    elif mode == "Centred floating":
+        monitor = next((item for item in monitors if item.get("focused")), None)
+        if monitor is None:
+            raise ValueError("Focused monitor is unavailable")
+        width, height = floating_size({"monitor": monitor["id"]}, monitors)
+        key = f"floating-{width}-{height}"
+        effects = f"float = true, center = true, size = {{ {width}, {height} }}"
+    else:
+        raise ValueError("Unknown window mode")
+    # Static effects must exist before mapping. Reuse the same rule on normal
+    # opens; replace it only when mode or fitted size changes. Like Omarchy's
+    # about-window sizing rule, this lives only in the compositor session.
+    return (f'if rss_feed_mode_rule and rss_feed_mode_key == "{key}" then '
+            'rss_feed_mode_rule:set_enabled(true) else '
+            'if rss_feed_mode_rule then rss_feed_mode_rule:set_enabled(false) end; '
+            'rss_feed_mode_rule = hl.window_rule({ '
+            'match = { initial_title = "^RSS Feed$" }, '
+            f'{effects} }}); rss_feed_mode_key = "{key}" end')
+
+
+def prepare(mode):
+    monitors = json.loads(hyprctl("-j", "monitors")) if mode == "Centred floating" else []
+    result = hyprctl("eval", preparation_rule(mode, monitors)).strip()
+    if result and result != "ok":
+        raise RuntimeError(result)
+
+
 def apply(mode, pid, attempts=12):
     for attempt in range(attempts):
         client = reader_client(json.loads(hyprctl("-j", "clients")), pid)
@@ -81,11 +111,15 @@ def apply(mode, pid, attempts=12):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("mode", choices=["Tiled", "Centred floating"])
+    parser.add_argument("--prepare", action="store_true", help="install the opening rule before the window is shown")
     args = parser.parse_args()
     try:
         # Quickshell's Process launches this helper directly, making its PID
         # the parent PID. Other applications with the same title are excluded.
-        apply(args.mode, os.getppid())
+        if args.prepare:
+            prepare(args.mode)
+        else:
+            apply(args.mode, os.getppid())
     except (OSError, ValueError, KeyError, RuntimeError, subprocess.SubprocessError) as error:
         print(f"Could not apply RSS Feed window mode: {error}", file=sys.stderr)
         return 1

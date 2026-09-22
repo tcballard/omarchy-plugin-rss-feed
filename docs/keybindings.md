@@ -26,7 +26,7 @@ Replace `YOUR CHORD` with an unused chord supported by your Hyprland configurati
 
 ## Inside RSS Feed
 
-Press **F** to open the feed manager. **Window mode** at the top offers **Tiled** (the default) and **Centred floating**. The preference is saved with your feeds and collections. Floating centres the reader on its own monitor, using a 1040 × 720 window reduced to fit the usable screen down to the reader's existing 720 × 480 minimum. It does not pin the window across workspaces or alter other applications. Escape dismisses an open mode dropdown before leaving the manager.
+Press **F** to open the feed manager. **Window mode** at the top offers **Tiled** (the default) and **Centred floating**. The preference is saved with your feeds and collections. The opening rule is prepared before the window appears, so floating mode starts floating rather than first occupying a tile. Floating centres the reader on its own monitor, using a 1040 × 720 window reduced to fit the usable screen down to the reader's existing 720 × 480 minimum. It does not pin the window across workspaces or alter other applications. Escape dismisses an open mode dropdown before leaving the manager.
 
 You can also select the same **Window mode** in the bar widget's settings. No Hyprland configuration edit or additional shortcut setup is needed. If you added the earlier manual `o.window({ title = "^RSS Feed$" }, ...)` rule, you can remove that rule; the built-in option now applies the chosen mode whenever RSS Feed opens.
 

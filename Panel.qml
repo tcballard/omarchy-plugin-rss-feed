@@ -22,6 +22,7 @@ Item {
   property bool managingFeeds: false
   property bool windowModePending: false
   property string windowModeError: ""
+  property bool preparingWindow: false
   readonly property string windowMode: news ? news.windowMode : "Tiled"
   readonly property string windowModeHelper: decodeURIComponent(Qt.resolvedUrl("window_mode.py").toString().replace(/^file:\/\//, ""))
 
@@ -49,14 +50,31 @@ Item {
   function open(payloadJson) {
     closingFromHost = false
     opened = true
-    window.visible = true
     focusArea = "headlines"
     selectedIndex = Math.max(0, Math.min(selectedIndex, articles.length - 1))
     if (!currentArticle && articles.length > 0) currentArticle = articles[selectedIndex]
     if (news && news.items.length === 0 && !news.refreshing) news.refresh(true)
-    markReadTimer.restart()
     requestWindowMode()
-    Qt.callLater(function() { focusScope.forceActiveFocus() })
+    if (window.visible) Qt.callLater(function() { focusScope.forceActiveFocus() })
+  }
+
+  function finishWindowMode(exitCode) {
+    if (!opened) return
+    if (windowModePending) {
+      windowModeTimer.restart()
+      return
+    }
+    if (exitCode !== 0) {
+      windowModeError = "Window mode could not be applied. Close and reopen RSS Feed to retry."
+      console.warn("RSS Feed window mode:", windowModeStderr.text)
+    }
+    if (preparingWindow) {
+      // Only map after the compositor has its initial float/tile/size rule.
+      // On failure show the reader with an error, without a delayed float.
+      window.visible = true
+      markReadTimer.restart()
+      Qt.callLater(function() { focusScope.forceActiveFocus() })
+    }
   }
 
   function close() {
@@ -228,7 +246,10 @@ Item {
     onTriggered: {
       if (!root.opened || windowModeProcess.running) return
       root.windowModePending = false
-      windowModeProcess.command = ["python3", root.windowModeHelper, root.windowMode]
+      root.preparingWindow = !window.visible
+      var command = ["python3", root.windowModeHelper, root.windowMode]
+      if (root.preparingWindow) command.push("--prepare")
+      windowModeProcess.command = command
       windowModeProcess.running = true
     }
   }
@@ -238,13 +259,7 @@ Item {
     running: false
     stderr: StdioCollector { id: windowModeStderr; waitForEnd: true }
     onExited: function(exitCode) {
-      if (!root.opened) return
-      if (root.windowModePending) {
-        windowModeTimer.restart()
-      } else if (exitCode !== 0) {
-        root.windowModeError = "Window mode could not be applied. Close and reopen RSS Feed to retry."
-        console.warn("RSS Feed window mode:", windowModeStderr.text)
-      }
+      root.finishWindowMode(exitCode)
     }
   }
 
