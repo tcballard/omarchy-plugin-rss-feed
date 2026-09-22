@@ -1,61 +1,67 @@
 # RSS Feed
 
-Your feeds, collections and articles in a proper desktop reader. Open it from the bar, pick a story, and read it alongside your headlines without switching to a browser.
+**Your feeds, at home on Omarchy.**
 
-This is the reader originally built in [Omarchy PR #10012](https://github.com/omacom/omarchy/pull/10012), extracted into an optional plugin with its own release cycle.
+A desktop RSS and Atom reader for following the sources you choose. Browse headlines on the left, read the story on the right, and keep your subscriptions together in named collections. Open it from the bar or a keyboard shortcut, tiled into your workspace or floating in the centre of the screen.
 
-- The existing two-pane reader, source rail and keyboard navigation.
-- Omarchy news, ten curated technology feeds, and your own RSS or Atom subscriptions.
-- Feed management and named collections inside the reader.
-- Unread tracking, cached articles for offline reading, and background refresh.
-- Theme colours, clickable article links, and an action to open the original story.
-- Choose a tiled reader or a centred floating window; RSS Feed remembers your choice.
+![RSS Feed running on my XPS, with headlines beside an open article in a centred floating window](preview.png)
 
-![RSS Feed floating reader with headline list and article pane](preview.png)
+## Made for everyday reading
+
+Omarchy announcements are always within reach. Add any of the ten included technology feeds, bring your own subscriptions, and organise them around what you follow.
+
+RSS Feed remembers what you've read, refreshes in the background and keeps cached articles available offline. It follows your Omarchy theme and works with both mouse and keyboard. When you want the publisher's full page, open the original in your browser.
+
+I originally built this reader for Omarchy itself. It now lives as an independent plugin, so improvements can ship without waiting for a shell release. The screenshot above is the plugin running on my XPS.
 
 ## Install
 
-Requires Omarchy Quattro with its plugin-capable Quickshell shell, Lua-enabled Hyprland (`hyprctl`), Python 3.12 or newer, system CA certificates, and coreutils (`mkdir`). No Python packages are needed. This is the **v0.1.0 candidate**. Opening and floating behaviour have been confirmed on the maintainer’s XPS; the full release checklist is still in progress. See [compatibility and validation](docs/validation.md).
+For **Omarchy Quattro with plugin support**. Requires Python 3.12+ alongside Omarchy's Quickshell, Lua-enabled Hyprland, system CA certificates and coreutils. No extra Python packages or accounts.
 
 ```bash
 omarchy plugin add https://github.com/tcballard/omarchy-plugin-rss-feed.git --enable
+```
+
+Click the RSS icon in your bar to open the reader. To add **Super + Alt + N**:
+
+```bash
 python3 ~/.config/omarchy/plugins/io.github.tcballard.rss-feed/scripts/keybindings.py
 ```
 
-Already using the original reader? Follow [migration](docs/installation.md) before enabling this plugin to keep your subscriptions, collections, placement, unread history and caches.
+The optional shortcut setup checks for conflicts and backs up your bindings before making changes.
 
-Press **Super + Alt + N** or click the RSS icon to open RSS Feed. Right-click the icon to refresh. Inside, **F** manages feeds, **R** refreshes, **O** opens the original article, and **Esc** returns or closes. [All keyboard and mouse controls →](docs/keybindings.md)
+Already using the original built-in reader? See the [migration guide](docs/installation.md) before enabling this one.
 
-For a pop-out reader, press **F** and set **Window mode → Centred floating**. It applies immediately and stays selected after a restart. Choose **Tiled** to put the reader back into your layout.
+## Make it yours
+
+Press **F** or click the gear to manage feeds and collections. Choose **Window mode → Centred floating** for a pop-out reader, or **Tiled** to keep it in your layout. Your choice is remembered.
+
+Use **R** to refresh, **O** to open the original article and **Esc** to go back or close. [All controls →](docs/keybindings.md)
 
 ## Update and remove
+
+Update:
 
 ```bash
 omarchy plugin update io.github.tcballard.rss-feed
 omarchy-restart-shell
 ```
 
-To remove the shortcut and plugin:
+Remove the shortcut and plugin:
 
 ```bash
 python3 ~/.config/omarchy/plugins/io.github.tcballard.rss-feed/scripts/keybindings.py --remove
 omarchy plugin remove io.github.tcballard.rss-feed
 ```
 
-Subscriptions and window preferences live in the shell configuration; cached articles and read history live in `${XDG_STATE_HOME:-$HOME/.local/state}/omarchy/news`. Removal retains this data and any setup backups. The optional shortcut installer changes `~/.config/hypr/bindings.lua` only when you explicitly run it, with conflict checks and a backup. [Installation, migration and rollback →](docs/installation.md)
+Removal keeps your cached articles and reading history. See [installation and removal](docs/installation.md) for retained settings, backups and rollback.
 
-## Privacy and support
+## A few useful details
 
-RSS Feed connects directly to enabled publishers over HTTPS. Custom feeds must resolve to public addresses; local-network feeds and authenticated URLs are unsupported. It does not use analytics or fetch article images. Article links open in your default browser only when activated. Feed URLs and cached content are stored locally in plain text: avoid secret-bearing subscription URLs. [Network, processes and data details →](docs/security.md)
+Feeds come directly from their publishers. No analytics, accounts or tracking service. Custom subscriptions need public HTTPS URLs; private-network and authenticated feeds aren't supported. Subscription URLs and cached articles are stored locally in plain text. [Privacy and dependencies →](docs/security.md)
 
-Report bugs through [GitHub Issues](https://github.com/tcballard/omarchy-plugin-rss-feed/issues). See [SECURITY.md](SECURITY.md) for vulnerability reporting.
+This is the **v0.1.0 candidate**, [submitted to the Plugin Store](https://github.com/omacom/omarchy-plugin-marketplace/issues/8069). Opening and floating have been tested on my XPS; the remaining release checks are recorded in [validation](docs/validation.md).
 
-## Development
+[Report a bug](https://github.com/tcballard/omarchy-plugin-rss-feed/issues) · [Feed catalogue](docs/feed-catalog.md) · [Security reporting](SECURITY.md)
 
-```bash
-bash test/all
-```
-
-See [validation](docs/validation.md), [the feed catalogue](docs/feed-catalog.md) and [marketplace alternatives](docs/marketplace.md). This repository contains the reader, its helper and its tests; installation does not patch the shell or run setup hooks.
-
-MIT licensed. Extracted from work in the Omarchy repository; its original licence is retained. Maintained by Tom Ballard.
+For development, run `bash test/all`. MIT licensed; the original Omarchy licence is retained. Made by [Tom Ballard](https://github.com/tcballard).
