@@ -64,7 +64,7 @@ Removal keeps your cached articles and reading history. See [installation and re
 
 Feeds come directly from their publishers. No analytics, accounts or tracking service. Custom subscriptions need public HTTPS URLs; private-network and authenticated feeds aren't supported. Subscription URLs and cached articles are stored locally in plain text. [Privacy and dependencies →](docs/security.md)
 
-This is the **v0.1.0 candidate**, [submitted to the Plugin Store](https://github.com/omacom/omarchy-plugin-marketplace/issues/8069). Opening and floating have been tested on my XPS; the remaining release checks are recorded in [validation](docs/validation.md).
+**v0.1.0** is [submitted to the Plugin Store](https://github.com/omacom/omarchy-plugin-marketplace/issues/8069). All on-device release checks passed on my XPS. [Validation details →](docs/validation.md)
 
 [Report a bug](https://github.com/tcballard/omarchy-plugin-rss-feed/issues) · [Feed catalogue](docs/feed-catalog.md) · [Security reporting](SECURITY.md)
 

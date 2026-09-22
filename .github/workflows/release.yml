@@ -1,0 +1,65 @@
+name: Publish release
+on:
+  push:
+    branches: [main]
+    paths:
+      - manifest.json
+      - .github/workflows/release.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: publish-release
+  cancel-in-progress: false
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+      - run: bash test/all
+      - name: Prepare release notes
+        run: |
+          python3 - <<'PY'
+          import json, os, re
+          from pathlib import Path
+          version = json.loads(Path('manifest.json').read_text())['version']
+          if not re.fullmatch(r'[0-9]+\.[0-9]+\.[0-9]+', version):
+              raise SystemExit('Expected a stable semantic version')
+          notes = Path(f'docs/releases/v{version}.md').read_text()
+          sha = os.environ['GITHUB_SHA']
+          repo = os.environ['GITHUB_REPOSITORY']
+          notes = notes.replace('/blob/main/', f'/blob/{sha}/')
+          notes = re.sub(r'(raw.githubusercontent.com/' + re.escape(repo) + r'/)[^/]+(/preview.png)', lambda m: m[1] + sha + m[2], notes)
+          notes += f'\nSource: `{sha}`\n'
+          Path('release-body.md').write_text(notes)
+          with open(os.environ['GITHUB_ENV'], 'a') as env:
+              env.write(f'RELEASE_TAG=v{version}\n')
+          PY
+      - name: Tag and publish verified source
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          test "$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)" = "$GITHUB_SHA"
+          if git show-ref --verify --quiet "refs/tags/$RELEASE_TAG"; then
+            test "$(git cat-file -t "$RELEASE_TAG")" = tag
+            test "$(git rev-parse "$RELEASE_TAG^{commit}")" = "$GITHUB_SHA"
+          else
+            git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' tag -a "$RELEASE_TAG" "$GITHUB_SHA" -m "RSS Feed $RELEASE_TAG"
+            git push origin "refs/tags/$RELEASE_TAG"
+          fi
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            echo "Release already exists; leaving it unchanged."
+          else
+            gh release create "$RELEASE_TAG" --verify-tag --title "RSS Feed $RELEASE_TAG" --notes-file release-body.md --latest
+          fi
+          gh release view "$RELEASE_TAG" --json url,tagName,isDraft,isPrerelease
