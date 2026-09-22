@@ -1,3 +1,5 @@
+> Historical preparation draft. RSS Feed was published in the [Omarchy Plugin Store](https://plugins.omarchy.org/plugin.html?id=io.github.tcballard.rss-feed) on 22 September 2026. The original candidate and pending-test statements below describe the pre-release draft; use [validation.md](validation.md) for completed release evidence and [#8069](https://github.com/omacom/omarchy-plugin-marketplace/issues/8069) for the submission outcome.
+
 ### Repository URL
 
 https://github.com/tcballard/omarchy-plugin-rss-feed
