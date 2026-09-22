@@ -1,5 +1,9 @@
 # RSS Feed
 
+[![Built for Omarchy: Plugin](https://raw.githubusercontent.com/tcballard/omarchy-badges/75975e5b5bf75e7ede3764bcd2950046f7abfe2c/badges/v1/omarchy-plugin.svg)](https://github.com/tcballard/omarchy-badges)
+[![Omarchy Quattro](https://img.shields.io/badge/Omarchy-Quattro-a6b98b?style=flat-square)](#install)
+[![Checks](https://github.com/tcballard/omarchy-plugin-rss-feed/actions/workflows/check.yml/badge.svg)](https://github.com/tcballard/omarchy-plugin-rss-feed/actions/workflows/check.yml)
+
 **Your feeds, at home on Omarchy.**
 
 A desktop RSS and Atom reader for following the sources you choose. Browse headlines on the left, read the story on the right, and keep your subscriptions together in named collections. Open it from the bar or a keyboard shortcut, tiled into your workspace or floating in the centre of the screen.
