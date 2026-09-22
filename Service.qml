@@ -187,6 +187,7 @@ Item {
         lastSeenBySource = ({})
       }
     } catch (error) {
+      readIds = []
       lastSeenBySource = ({})
     }
     stateLoaded = true

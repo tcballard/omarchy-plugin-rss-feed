@@ -23,9 +23,19 @@ The window-mode follow-up includes thirteen Python tests for exact PID/title/add
 
 Dispatcher syntax follows the [Hyprland Lua examples](https://wiki.hypr.land/configuring/code-snippets/) and the targeted window dispatch pattern in Omarchy's `omarchy-hyprland-window-pop` at the recorded host revision. The opening path now installs a session-only rule matching the exact initial title `RSS Feed` before the window becomes visible, following `omarchy-launch-about`’s pre-map sizing pattern. It reuses the rule on repeated opens and replaces it when mode or fitted size changes. No configuration files are changed. Already-visible mode changes still use exact PID/title/address targeting. Tests verify that the window stays hidden until preparation completes and that late completion cannot reopen a closed reader.
 
+## Maintainer feedback, 22 September 2026
+
+Tom confirmed that explicit plugin summon opens the intended RSS Feed UI on his XPS. After commit `205580817744fc1e5a248795acf9b5ca46ae39e9`, he confirmed the opening behaviour was “much better”. This confirms that specific interaction, not every lifecycle state below. His exact installed Omarchy revision and display scale have not yet been recorded. The subsequent hardening candidate requires an update and recheck.
+
+## Hardening evidence
+
+`python3 test/fetch_security_test.py` covers DNS rebinding, mixed public/private answers, TLS hostname verification, socket cleanup/fallback, malformed URLs, XML entity/depth/byte limits, active markup and output size, malformed and oversized caches, truncated HTTP responses, and a real subprocess deadline with a blocked worker thread. All fixtures are local; they do not depend on publisher uptime.
+
+The complete suite is also available through `tests/run`. The skill release preflight expects that path. Its bundled validator lookup assumes named skill directories; in this environment the skills use hashed package directories. Run the validator directly, or inject its resolved path into `release_preflight.validator_path` without changing the checks. The older validator’s multiselect warning is documented above. The release wrapper promotes this warning to an error, so its overall result is NOT READY; the unmodified Quattro validator passes. Do not label that wrapper result a pass or change the supported setting type merely to suppress its outdated whitelist.
+
 ## On-device checks still required
 
-The original PR body reports live desktop testing of the original reader. That is not evidence that the extracted plugin has passed on-device testing. No Qt/Quickshell compositor was available for this extraction; QML compilation, visual comparison and the following lifecycle checks remain unrun:
+The original PR body reports live desktop testing of the original reader. That is not evidence that the extracted plugin has passed on-device testing. No Qt/Quickshell compositor is available in the development environment. Beyond the maintainer feedback above, QML compilation and the following lifecycle checks remain unrun:
 
 1. Install on stock Quattro; enable once; verify one RSS bar icon and no unsolicited reader window.
 2. Open, close and reopen by bar and IPC; check mouse, keyboard, independent scrolling, article links and source colours.
@@ -37,4 +47,4 @@ The original PR body reports live desktop testing of the original reader. That i
 8. Disable during refresh, re-enable, update from Git once published, then remove; confirm processes stop and retained user data remains intact.
 9. Select **F → Window mode → Centred floating** while open, switch back to Tiled, close/reopen, and restart the shell. Confirm the preference persists, only RSS Feed moves, and centring/sizing works on each monitor, including scaling and rotation. Change mode rapidly, close during placement and verify no other window moves. Open the mode dropdown and press Escape: only the dropdown should close first. Repeatedly open in floating mode and confirm there is no initial tiled frame or desktop reflow; repeat after reloading Hyprland.
 
-The upstream PR is still open. Close or supersede it only after the standalone repository is available and the on-device migration passes.
+The upstream PR is still open. Closing or superseding it is a separate action after the independent plugin is accepted; migration is optional for users who want their older settings.

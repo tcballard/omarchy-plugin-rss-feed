@@ -54,6 +54,7 @@ ok - empty source clears the article
 ok - each accepted edit is submitted for persistence before returning
 ok - successive edits preserve other settings
 ok - later edits do not mutate earlier snapshots
+ok - corrupt read state clears stale in-memory acknowledgements without blocking startup
 ok - selected article is read
 ok - other sources remain unread
 ok - other articles remain unread
@@ -64,10 +65,10 @@ ok - read history is bounded
 ok - read IDs survive restart
 ok - Atom text, XHTML, inherited bases and safe relative links
 ok - shortened articles show a notice outside links, without flagging exact limits or stripped content
-rss-reader-perf sources=21 items=210 cold_ms=106.4 warm_ms=31.4 payload_kib=4994.6
+rss-reader-perf sources=21 items=210 cold_ms=108.7 warm_ms=43.2 payload_kib=4994.6
 ok - RSS Feed cold and warm paths stay within bounded performance budgets
 ok - RSS Feed warm cache performs zero network fetches at the 21-source ceiling
-rss-reader-collections sources=21 items=210 groups=8 rebuilds=1000 elapsed_ms=20.0
+rss-reader-collections sources=21 items=210 groups=8 rebuilds=1000 elapsed_ms=18.9
 ok - RSS Feed collection indexing stays within its bounded performance budget
 ok - invalid cache timestamps cannot abort refresh
 ok - cache write failures preserve freshly fetched articles
@@ -105,7 +106,7 @@ ok - late preparation completion cannot reopen a closed reader
 ok - preparation failure exposes a readable error without a late float
 .....
 ----------------------------------------------------------------------
-Ran 5 tests in 0.002s
+Ran 5 tests in 0.001s
 
 OK
 .........
@@ -116,5 +117,10 @@ OK
 .............
 ----------------------------------------------------------------------
 Ran 13 tests in 0.001s
+
+OK
+..........
+----------------------------------------------------------------------
+Ran 10 tests in 1.182s
 
 OK

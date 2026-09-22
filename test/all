@@ -10,3 +10,4 @@ done
 python3 "$ROOT/test/migration_test.py"
 python3 "$ROOT/test/keybindings_test.py"
 python3 "$ROOT/test/window_mode_test.py"
+python3 "$ROOT/test/fetch_security_test.py"

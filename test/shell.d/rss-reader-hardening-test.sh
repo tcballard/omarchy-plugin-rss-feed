@@ -25,6 +25,11 @@ persist(news, shell, {feedCollections:'[]'})
 assert(writes.length === 2, 'each accepted edit is submitted for persistence before returning')
 assert(writes[1].settings.enabledFeeds[0] === 'wired' && writes[1].settings.customFeeds === 'existing', 'successive edits preserve other settings')
 assert(writes[0].settings.feedCollections === undefined, 'later edits do not mutate earlier snapshots')
+const service = fs.readFileSync(path.join(root, 'Service.qml'), 'utf8')
+const loadBody = service.match(/function loadReadState\(raw\) \{([\s\S]*?)\n  \}/)[1]
+const loadState = new Function('raw', 'readIds', 'lastSeenBySource', 'stateLoaded', loadBody + '; return {readIds,lastSeenBySource,stateLoaded};')
+const corrupt = loadState('{broken', ['stale'], {a:'stale'}, false)
+assert(corrupt.readIds.length === 0 && Object.keys(corrupt.lastSeenBySource).length === 0 && corrupt.stateLoaded, 'corrupt read state clears stale in-memory acknowledgements without blocking startup')
 const items = [{id:'a:3', sourceId:'a'}, {id:'b:1', sourceId:'b'}, {id:'a:2', sourceId:'a'}, {id:'a:1', sourceId:'a'}]
 const ids = read.mark([], 'a:3')
 assert(read.isRead(items[0], items, ids, {}), 'selected article is read')

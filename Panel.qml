@@ -751,7 +751,7 @@ Item {
                   font.pixelSize: Style.font.body
                   lineHeight: 1.35
                   wrapMode: Text.WordWrap
-                  onLinkActivated: function(link) { Qt.openUrlExternally(link) }
+                  onLinkActivated: function(link) { if (/^https?:\/\//i.test(String(link))) Qt.openUrlExternally(link) }
 
                   HoverHandler {
                     cursorShape: articleBody.hoveredLink !== "" ? Qt.PointingHandCursor : Qt.ArrowCursor

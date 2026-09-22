@@ -40,7 +40,7 @@ with patch.object(reader, "fetch", side_effect=OSError("offline")), patch.object
     assert items[0]["title"] == "Offline"
     assert state["stale"] and error == "offline"
 
-with patch.object(reader.Path, "read_text", side_effect=UnicodeDecodeError("utf8", b'\xff', 0, 1, "invalid")):
+with patch.object(reader.Path, "open", side_effect=UnicodeDecodeError("utf8", b'\xff', 0, 1, "invalid")):
     assert reader.cached_result(source, "") is None
 
 # Exercise the actual redirect handler, without making a network request.

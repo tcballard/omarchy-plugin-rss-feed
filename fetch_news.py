@@ -7,9 +7,11 @@ import argparse
 import copy
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import hashlib
+import http.client
 import ipaddress
 import json
 import os
+import signal
 import socket
 import ssl
 import sys
@@ -29,6 +31,9 @@ DEFAULT_ITEM_LIMIT = 10
 USER_AGENT = "Omarchy-RSS-Feed/0.1"
 SYSTEM_CA_BUNDLE = "/etc/ssl/certs/ca-certificates.crt"
 MAX_ARTICLE_CHARS = 12_000
+MAX_MARKUP_CHARS = 65_536
+MAX_CACHE_BYTES = 8 * 1024 * 1024
+HELPER_DEADLINE_SECONDS = 45
 SSL_CONTEXT = ssl.create_default_context(cafile=SYSTEM_CA_BUNDLE)
 
 # Package-owned catalogue; never load feed policy from user settings or the network.
@@ -104,7 +109,7 @@ class ArticleMarkupParser(HTMLParser):
             self.parts.append("• ")
         if tag == "a":
             href = next((value for name, value in attrs if name.lower() == "href"), None)
-            safe_href = external_url(urljoin(self.base_url, href or "")) if href else ""
+            safe_href = external_url(safe_urljoin(self.base_url, href or "")) if href else ""
             self.link_stack.append(bool(safe_href))
             if safe_href:
                 self.parts.append(f'<a href="{escape(safe_href, quote=True)}">')
@@ -153,7 +158,7 @@ def article_text(value: str | None, limit: int = MAX_ARTICLE_CHARS) -> str:
 
 def external_url(value: str | None) -> str:
     url = clean_text(value, 2048)
-    parsed = urlparse(url)
+    parsed = safe_urlparse(url)
     try:
         parsed.port
     except ValueError:
@@ -167,9 +172,10 @@ def external_url(value: str | None) -> str:
 
 def article_markup(value: str | None, limit: int = MAX_ARTICLE_CHARS, base_url: str = "") -> str:
     parser = ArticleMarkupParser(limit, base_url)
-    parser.feed(value or "")
+    parser.feed((value or "")[:MAX_MARKUP_CHARS])
     parser.close()
-    return parser.markup()
+    markup = parser.markup()
+    return markup if len(markup) <= MAX_MARKUP_CHARS else escape(article_text(value, limit), quote=False)
 
 
 def element_text(node: ET.Element | None) -> str:
@@ -206,7 +212,7 @@ def element_markup(node: ET.Element | None) -> str:
 def atom_markup(node: ET.Element | None, base_url: str) -> tuple[str, str]:
     if node is None:
         return "", base_url
-    base_url = urljoin(base_url, node.get("{http://www.w3.org/XML/1998/namespace}base", ""))
+    base_url = safe_urljoin(base_url, node.get("{http://www.w3.org/XML/1998/namespace}base", ""))
     kind = node.get("type", "text")
     if kind in {"text", "text/plain"}:
         return escape(element_text(node)), base_url
@@ -217,10 +223,10 @@ def atom_markup(node: ET.Element | None, base_url: str) -> tuple[str, str]:
     node = copy.deepcopy(node)
 
     def normalize(element: ET.Element, base: str) -> None:
-        base = urljoin(base, element.get("{http://www.w3.org/XML/1998/namespace}base", ""))
+        base = safe_urljoin(base, element.get("{http://www.w3.org/XML/1998/namespace}base", ""))
         element.tag = local_name(element.tag)
         if "href" in element.attrib:
-            element.set("href", urljoin(base, element.get("href", "")))
+            element.set("href", safe_urljoin(base, element.get("href", "")))
         for nested in element:
             normalize(nested, base)
 
@@ -242,8 +248,22 @@ def cache_path(source_id: str = "omarchy") -> Path:
 
 
 def clean_text(value: str | None, limit: int) -> str:
-    text = " ".join((value or "").split())
+    text = " ".join((value if isinstance(value, str) else "").split())
     return text[:limit]
+
+
+def safe_urljoin(base: str, value: str) -> str:
+    try:
+        return urljoin(base, value)
+    except ValueError:
+        return ""
+
+
+def safe_urlparse(value: str):
+    try:
+        return urlparse(value)
+    except ValueError:
+        return urlparse("")
 
 
 def host_matches(host: str, allowed_hosts: tuple[str, ...]) -> bool:
@@ -252,7 +272,7 @@ def host_matches(host: str, allowed_hosts: tuple[str, ...]) -> bool:
 
 def source_article_url(value: str | None, source: dict[str, object]) -> str:
     url = clean_text(value, 2048)
-    parsed = urlparse(url)
+    parsed = safe_urlparse(url)
     host = (parsed.hostname or "").lower()
     allow_external = source.get("allow_external_articles") is True
     allowed_hosts = tuple(str(host) for host in source["article_hosts"])
@@ -271,12 +291,12 @@ def source_article_url(value: str | None, source: dict[str, object]) -> str:
     if not parsed.path.startswith(str(source["article_path_prefix"])):
         return ""
     query = parsed.query if allow_external else ""
-    return parsed._replace(netloc=host, params="", query=query, fragment="").geturl()
+    return parsed._replace(netloc=f"[{host}]" if ":" in host else host, params="", query=query, fragment="").geturl()
 
 
 def canonical_feed_url(value: str | None) -> str:
     url = clean_text(value, 2048)
-    parsed = urlparse(url)
+    parsed = safe_urlparse(url)
     host = (parsed.hostname or "").lower()
     try:
         port = parsed.port
@@ -351,13 +371,38 @@ def canonical_news_url(value: str | None) -> str:
     return source_article_url(value, SOURCE_CATALOG["omarchy"])
 
 
+class FeedTreeBuilder(ET.TreeBuilder):
+    def __init__(self):
+        super().__init__()
+        self.depth = 0
+
+    def doctype(self, name, pubid, system):
+        raise ValueError("Feed document types and entities are not supported")
+
+    def start(self, tag, attrs):
+        self.depth += 1
+        if self.depth > 128:
+            raise ValueError("Feed XML is nested too deeply")
+        return super().start(tag, attrs)
+
+    def end(self, tag):
+        self.depth -= 1
+        return super().end(tag)
+
+
+def feed_root(payload: bytes):
+    if len(payload) > MAX_RESPONSE_BYTES:
+        raise ValueError("feed exceeds the 1 MiB limit")
+    return ET.fromstring(payload, parser=ET.XMLParser(target=FeedTreeBuilder()))
+
+
 def parse_feed(
     payload: bytes,
     source: dict[str, object] | None = None,
     item_limit: int = MAX_ITEMS,
 ) -> list[dict[str, str]]:
     source = source or SOURCE_CATALOG["omarchy"]
-    root = ET.fromstring(payload)
+    root = feed_root(payload)
     items: list[dict[str, str]] = []
     creator_tag = "{http://purl.org/dc/elements/1.1/}creator"
     content_tag = "{http://purl.org/rss/1.0/modules/content/}encoded"
@@ -376,12 +421,12 @@ def parse_feed(
         body_base = str(source["url"])
         if is_atom:
             xml_base = "{http://www.w3.org/XML/1998/namespace}base"
-            entry_base = urljoin(urljoin(str(source["url"]), root.get(xml_base, "")), node.get(xml_base, ""))
+            entry_base = safe_urljoin(safe_urljoin(str(source["url"]), root.get(xml_base, "")), node.get(xml_base, ""))
             atom_links = children(node, "link")
             author_node = child(node, "author")
             raw_link = next(
                 (
-                    urljoin(urljoin(entry_base, candidate.get(xml_base, "")), candidate.get("href", ""))
+                    safe_urljoin(safe_urljoin(entry_base, candidate.get(xml_base, "")), candidate.get("href", ""))
                     for candidate in atom_links
                     if candidate.get("rel", "alternate") in {"", "alternate"}
                 ),
@@ -437,7 +482,7 @@ def parse_feed(
 
 
 def feed_name(payload: bytes) -> str:
-    root = ET.fromstring(payload)
+    root = feed_root(payload)
     container = root if local_name(root.tag) == "feed" else child(root, "channel")
     if container is None:
         raise ValueError("RSS or Atom feed is missing its item container")
@@ -472,7 +517,7 @@ def require_public_feed_url(value: str) -> str:
 
 
 def safe_redirect_url(source: dict[str, object], current_url: str, target: str) -> str:
-    redirected = canonical_feed_url(urljoin(current_url, target))
+    redirected = canonical_feed_url(safe_urljoin(current_url, target))
     if not redirected:
         raise ValueError("feed redirect must use a public HTTPS URL")
     if source.get("custom") is True:
@@ -498,6 +543,40 @@ class SafeRedirectHandler(urllib.request.HTTPRedirectHandler):
         return super().redirect_request(req, fp, code, msg, headers, redirected)
 
 
+def public_connection(address, timeout=8, source_address=None):
+    """Connect to the exact validated address, without a second DNS lookup."""
+    host, port = address
+    addresses = socket.getaddrinfo(host, port, type=socket.SOCK_STREAM)
+    if not addresses or any(not ipaddress.ip_address(item[4][0]).is_global for item in addresses):
+        raise ValueError("feed host does not resolve exclusively to public addresses")
+    last_error = None
+    for family, kind, protocol, _, endpoint in addresses:
+        connection = socket.socket(family, kind, protocol)
+        try:
+            connection.settimeout(timeout)
+            if source_address:
+                connection.bind(source_address)
+            connection.connect(endpoint)
+            return connection
+        except OSError as error:
+            last_error = error
+            connection.close()
+    raise last_error or OSError("feed host could not be reached")
+
+
+class PublicHTTPSConnection(http.client.HTTPSConnection):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # HTTPSConnection still performs hostname verification and sends SNI
+        # for the original hostname, while the socket uses a checked IP.
+        self._create_connection = public_connection
+
+
+class PublicHTTPSHandler(urllib.request.HTTPSHandler):
+    def https_open(self, request):
+        return self.do_open(PublicHTTPSConnection, request, context=SSL_CONTEXT)
+
+
 def fetch(source: dict[str, object] | None = None) -> bytes:
     source = source or SOURCE_CATALOG["omarchy"]
     feed_url = str(source["url"])
@@ -513,7 +592,7 @@ def fetch(source: dict[str, object] | None = None) -> bytes:
     opener = urllib.request.build_opener(
         urllib.request.ProxyHandler({}),
         SafeRedirectHandler(source),
-        urllib.request.HTTPSHandler(context=SSL_CONTEXT),
+        PublicHTTPSHandler(context=SSL_CONTEXT),
     )
     with opener.open(request, timeout=8) as response:
         payload = response.read(MAX_RESPONSE_BYTES + 1)
@@ -540,16 +619,30 @@ def atomic_write(path: Path, data: dict[str, object]) -> None:
 
 def cached_result(source: dict[str, object], error: str) -> dict[str, object] | None:
     try:
-        cached = json.loads(cache_path(str(source["id"])).read_text(encoding="utf-8"))
-    except (OSError, UnicodeError, json.JSONDecodeError):
+        with cache_path(str(source["id"])).open("rb") as handle:
+            payload = handle.read(MAX_CACHE_BYTES + 1)
+        if len(payload) > MAX_CACHE_BYTES:
+            return None
+        cached = json.loads(payload)
+    except (OSError, UnicodeError, ValueError, RecursionError):
         return None
     if not isinstance(cached, dict) or not isinstance(cached.get("items"), list):
         return None
     cached["stale"] = bool(error)
     cached["error"] = clean_text(error, 180)
-    for item in cached["items"]:
+    valid_items = []
+    for item in cached["items"][:MAX_ITEMS]:
         if not isinstance(item, dict):
             continue
+        item = {key: item.get(key) for key in ("url", "title", "id", "sourceName", "author", "published", "summary", "content", "contentHtml")}
+        item["url"] = source_article_url(item.get("url"), source)
+        item["title"] = clean_text(item.get("title"), 240)
+        if not item["url"] or not item["title"]:
+            continue
+        for key, limit in (("id", 2200), ("sourceName", 48), ("author", 80), ("published", 100), ("summary", 500), ("content", MAX_ARTICLE_CHARS)):
+            item[key] = clean_text(item.get(key), limit) if key != "content" else (item[key][:limit] if isinstance(item.get(key), str) else "")
+        markup = item.get("contentHtml")
+        item["contentHtml"] = article_markup(markup if isinstance(markup, str) else "", base_url=item["url"])
         item["sourceId"] = str(source["id"])
         if source.get("user_named") is True or not item.get("sourceName"):
             item["sourceName"] = str(source["name"])
@@ -558,6 +651,10 @@ def cached_result(source: dict[str, object], error: str) -> dict[str, object] | 
         item_id = str(item.get("id", ""))
         if item_id and not item_id.startswith(f'{source["id"]}:'):
             item["id"] = f'{source["id"]}:{item_id}'
+        if not item["id"]:
+            item["id"] = f'{source["id"]}:{item["url"]}'
+        valid_items.append(item)
+    cached["items"] = valid_items
     return cached
 
 
@@ -640,7 +737,7 @@ def load_source(
             except OSError as exc:
                 # Cache persistence is optional; never discard a successful fetch.
                 error = clean_text(f"Could not save feed cache: {exc}", 180)
-        except (OSError, ValueError, ET.ParseError) as exc:
+        except (OSError, ValueError, ET.ParseError, http.client.HTTPException) as exc:
             error = clean_text(str(exc), 180)
             cached = cached_result(source, error)
             source_items = [] if cached is None else [
@@ -679,7 +776,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.inspect_feed:
         try:
             inspected = inspect_custom_feed(args.inspect_feed, args.inspect_name)
-        except (OSError, ValueError, ET.ParseError) as exc:
+        except (OSError, ValueError, ET.ParseError, http.client.HTTPException) as exc:
             print(clean_text(str(exc), 180), file=sys.stderr)
             return 1
         json.dump({"ok": True, **inspected}, sys.stdout, ensure_ascii=False, separators=(",", ":"))
@@ -746,5 +843,16 @@ def main(argv: list[str] | None = None) -> int:
     return 0
 
 
+def install_deadline(seconds=HELPER_DEADLINE_SECONDS):
+    def expired(signum, frame):
+        # The helper has worker threads but no child processes. Exit all of
+        # them even if DNS or a trickling response outlives socket timeouts.
+        os.write(2, b"RSS refresh exceeded its time limit; cached articles remain available\n")
+        os._exit(124)
+    signal.signal(signal.SIGALRM, expired)
+    signal.alarm(seconds)
+
+
 if __name__ == "__main__":
+    install_deadline()
     raise SystemExit(main())

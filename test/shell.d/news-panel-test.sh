@@ -358,7 +358,7 @@ grep -qF 'if (root.managingFeeds) {' "$ROOT/Panel.qml" ||
   fail "news reader leaves ordinary keys to visible feed-manager controls"
 grep -qF 'return ReaderPalette.green' "$ROOT/Panel.qml" ||
   fail "news source rail maps feed categories onto theme colours"
-grep -qF 'onLinkActivated: function(link) { Qt.openUrlExternally(link) }' "$ROOT/Panel.qml" ||
+grep -qF 'onLinkActivated: function(link) { if (/^https?:\/\//i.test(String(link))) Qt.openUrlExternally(link) }' "$ROOT/Panel.qml" ||
   fail "news story opens deliberately activated links"
 grep -qF 'text: "OPEN ORIGINAL"' "$ROOT/Panel.qml" ||
   fail "news story exposes its primary publisher link"

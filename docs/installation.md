@@ -72,4 +72,4 @@ The plugin has no uninstall hooks and does not delete your read history, cached 
 
 ## Moving from an archive to a Git installation
 
-Replace the local archive checkout with a Git installation through `omarchy plugin add https://github.com/tcballard/omarchy-plugin-rss-feed.git --enable`, from the published repository. Preserve the existing configuration and state. Live installation, update and removal checks are still pending.
+Replace the local archive checkout with a Git installation through `omarchy plugin add https://github.com/tcballard/omarchy-plugin-rss-feed.git --enable`, from the published repository. Preserve the existing configuration and state. The full installation, update and removal release checklist is in [validation](validation.md).
