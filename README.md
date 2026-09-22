@@ -2,7 +2,6 @@
 
 <p align="center">
   <a href="https://github.com/tcballard/omarchy-badges"><img src="https://raw.githubusercontent.com/tcballard/omarchy-badges/75975e5b5bf75e7ede3764bcd2950046f7abfe2c/badges/v1/omarchy-plugin.svg" alt="Built for Omarchy: Plugin" height="24"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-a6b98b?style=flat-square" alt="MIT licence" height="24"></a>
 </p>
 
 **Your feeds, at home on Omarchy.**
