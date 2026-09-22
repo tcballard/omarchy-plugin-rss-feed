@@ -25,7 +25,7 @@ Dispatcher syntax follows the [Hyprland Lua examples](https://wiki.hypr.land/con
 
 ## Maintainer feedback, 22 September 2026
 
-Tom confirmed that explicit plugin summon opens the intended RSS Feed UI on his XPS. After commit `205580817744fc1e5a248795acf9b5ca46ae39e9`, he confirmed the opening behaviour was “much better”. This confirms that specific interaction, not every lifecycle state below. His exact installed Omarchy revision and display scale have not yet been recorded. The subsequent hardening candidate requires an update and recheck.
+Tom confirmed that explicit plugin summon opens the intended RSS Feed UI on his XPS. After commit `205580817744fc1e5a248795acf9b5ca46ae39e9`, he confirmed the opening behaviour was “much better”. This confirms that specific interaction, not every lifecycle state below. His exact installed Omarchy revision and display scale have not yet been recorded. The subsequent hardening candidate was included in Tom’s final confirmation that all on-device checks had passed.
 
 ## Hardening evidence
 
@@ -33,9 +33,9 @@ Tom confirmed that explicit plugin summon opens the intended RSS Feed UI on his 
 
 The complete suite is also available through `tests/run`. The skill release preflight expects that path. Its bundled validator lookup assumes named skill directories; in this environment the skills use hashed package directories. Run the validator directly, or inject its resolved path into `release_preflight.validator_path` without changing the checks. The older validator’s multiselect warning is documented above. The release wrapper promotes this warning to an error, so its overall result is NOT READY; the unmodified Quattro validator passes. Do not label that wrapper result a pass or change the supported setting type merely to suppress its outdated whitelist.
 
-## On-device checks still required
+## On-device release checks — passed
 
-The original PR body reports live desktop testing of the original reader. That is not evidence that the extracted plugin has passed on-device testing. No Qt/Quickshell compositor is available in the development environment. Beyond the maintainer feedback above, QML compilation and the following lifecycle checks remain unrun:
+On 22 September 2026, Tom confirmed that all outstanding on-device checks had passed on his XPS and authorized the v0.1.0 release. The list below records that completed scope. This is maintainer-reported evidence; the development environment has no Qt/Quickshell compositor. The exact installed Omarchy SHA and display scale were not supplied.
 
 1. Install on stock Quattro; enable once; verify one RSS bar icon and no unsolicited reader window.
 2. Open, close and reopen by bar and IPC; check mouse, keyboard, independent scrolling, article links and source colours.
