@@ -1,25 +1,39 @@
-# Plugin Store submission preparation
+# Release preparation and Plugin Store status
 
-Repository: [tcballard/omarchy-plugin-rss-feed](https://github.com/tcballard/omarchy-plugin-rss-feed). Version: **0.1.0 candidate**, untagged. GitHub Actions runs the portable checks on each push and pull request. The full candidate identity is the commit containing this draft (`git rev-parse HEAD`), reported with the preparation handoff and its CI run. Do not treat later HEAD changes as covered by an older report.
+## v0.1.0
 
-## Prepared listing
+The manifest already declares **0.1.0**. This PR prepares that version; it does not create a tag or publish a release. The base is `b786eb40fc137ba89983573e854dbf30371e18c5`. Runtime code is unchanged from the hardened submission at `aa476b512763188387d638f45cac165176fe61e0`; later main-branch commits change only the README.
 
-- Title: **[Plugin]: RSS Feed**
-- Category: **Productivity**
-- Tags: **Bar, Quickshell, Media**
-- Reviewable six-section body: [store-submission.md](store-submission.md).
+[Release notes](releases/v0.1.0.md) include Tom's supplied screenshot, the product story, features and install/update commands. [Preview provenance](preview.md) records the original image and its limitations. A replacement screenshot is not required.
 
-The form was read from `omacom/omarchy-plugin-marketplace` on 22 September 2026; the observed main SHA was `83e08dff5fc9284a2dd11effcedaabd59ed104f7`, and the form blob was `572e3b21e2d92bc97424c54a25789be94e0bfee3`. Compared with the skill's older form, VPN is now an additional tag; this draft uses labels valid in both. Searches by repository name and plugin ID found no matching submission; recheck immediately before opening one.
+Use branches and batched PRs for changes from this point forward. [Contributing](../CONTRIBUTING.md) records the workflow and README conventions.
 
-The checklist is deliberately unchecked pending the owner's confirmation, particularly code/asset rights. Preparation has not created a marketplace issue, tag or GitHub release. The publishing workflow requires approval of the completed body and all five statements before sending it. Marketplace listing also requires maintainer review; successful tests do not confer approval.
+## Marketplace evidence
 
-## Candidate status and remaining work
+Tom submitted [#8069](https://github.com/omacom/omarchy-plugin-marketplace/issues/8069). The earlier `store-submission.md` is a historical preparation draft; the issue is the authoritative submitted body. Do not open a duplicate.
 
-- Portable suite and the unmodified Quattro manifest validator pass; results are in `test-results.txt` and CI for the candidate commit.
-- The advisory scan has no findings, with process and collected-input capabilities reviewed in [security notes](security.md). It is not a security audit.
-- The skill release preflight remains **NOT READY**: its older whitelist rejects Quattro's valid `multiselect` schema when warnings are promoted to errors. The named-skill path lookup also needs the resolved validator location in this environment. This tooling mismatch is recorded rather than bypassed or presented as a pass.
-- Tom confirmed the plugin opens and the pre-map floating fix improves its behaviour on his XPS. Update and test this hardened build; record its full plugin SHA and installed Omarchy SHA. Follow the remaining lifecycle checks in [validation](validation.md), especially offline refresh, feed/collection persistence, disable during refresh, Git update, shortcut removal and plugin removal.
-- Root `preview.png` contains Tom’s supplied screenshot of the correct RSS Feed plugin. It is unchanged; dimensions, checksum and capture limitations are recorded in [preview provenance](preview.md). No replacement screenshot is required for this preparation.
-- After the remaining host evidence is supplied, refresh the source identity, CI and exact submission body. Show that final body to the owner for approval before submission. Tagging/releasing is a separate authorized action and requires the release evidence.
+At `aa476b512763188387d638f45cac165176fe61e0`:
 
-Keep upstream PR #10012 open during this preparation; superseding that PR is a separate action.
+- [Quattro compatibility passed](https://github.com/omacom/omarchy-plugin-marketplace/issues/8069#issuecomment-5772200422), including the manifest, README, licence and root preview.
+- [The automated security baseline passed](https://github.com/omacom/omarchy-plugin-marketplace/issues/8069#issuecomment-5772200710), with no findings or action requested. It is not a security audit or listing approval.
+
+Those reports identify that exact snapshot, not newer README or release-preparation commits. After the release PR merges, provide its final full SHA on the existing submission for fresh review. The GitHub App currently cannot write to the marketplace repository; Tom submitted the issue himself.
+
+## Before publishing
+
+- [ ] Merge the batched release PR after its CI passes.
+- [ ] Record the full merged commit and its CI run; the release tag must identify that source.
+- [ ] Complete the remaining host checks in [validation](validation.md), recording plugin/Omarchy revisions. Tom's XPS opening/floating feedback and supplied screenshot are already recorded.
+- [ ] Rerun the portable suite and official validation for the final source. Record the local preflight's known schema/tooling mismatch separately from the upstream result.
+- [ ] Make release-note evidence links immutable at the final merged SHA; publish only claims supported by the recorded results.
+- [ ] After release authorization, create the annotated `v0.1.0` tag and GitHub release using the prepared notes. Do not move an existing tag.
+- [ ] If attaching separately built archives, produce their checksums and source/release manifests from that exact tag, and verify downloaded assets before publication. No release archives have been uploaded during preparation.
+- [ ] Update the existing marketplace request with the final SHA; do not imply prior baseline results cover it.
+
+No final release SHA can be fixed until merge. The preparation PR's head identifies the candidate tested by its CI.
+
+## Local preflight limitation
+
+The older release-skill validator promotes its unsupported `multiselect` warning to an error and reports **NOT READY**. Quattro's unmodified validator and the actual marketplace compatibility check accept the setting. The skill's named-package lookup also requires the resolved validator path in this environment. These tooling limitations are recorded, not hidden or described as passes. Actual host lifecycle checks remain a separate release requirement.
+
+Keep upstream PR #10012 open during preparation; superseding it is a separate action.

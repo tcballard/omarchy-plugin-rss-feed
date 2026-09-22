@@ -65,10 +65,10 @@ ok - read history is bounded
 ok - read IDs survive restart
 ok - Atom text, XHTML, inherited bases and safe relative links
 ok - shortened articles show a notice outside links, without flagging exact limits or stripped content
-rss-reader-perf sources=21 items=210 cold_ms=108.7 warm_ms=43.2 payload_kib=4994.6
+rss-reader-perf sources=21 items=210 cold_ms=113.1 warm_ms=40.6 payload_kib=4994.6
 ok - RSS Feed cold and warm paths stay within bounded performance budgets
 ok - RSS Feed warm cache performs zero network fetches at the 21-source ceiling
-rss-reader-collections sources=21 items=210 groups=8 rebuilds=1000 elapsed_ms=18.9
+rss-reader-collections sources=21 items=210 groups=8 rebuilds=1000 elapsed_ms=22.7
 ok - RSS Feed collection indexing stays within its bounded performance budget
 ok - invalid cache timestamps cannot abort refresh
 ok - cache write failures preserve freshly fetched articles
@@ -116,11 +116,11 @@ Ran 9 tests in 0.002s
 OK
 .............
 ----------------------------------------------------------------------
-Ran 13 tests in 0.001s
+Ran 13 tests in 0.002s
 
 OK
 ..........
 ----------------------------------------------------------------------
-Ran 10 tests in 1.182s
+Ran 10 tests in 1.189s
 
 OK

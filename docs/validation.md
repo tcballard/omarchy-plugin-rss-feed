@@ -48,3 +48,9 @@ The original PR body reports live desktop testing of the original reader. That i
 9. Select **F → Window mode → Centred floating** while open, switch back to Tiled, close/reopen, and restart the shell. Confirm the preference persists, only RSS Feed moves, and centring/sizing works on each monitor, including scaling and rotation. Change mode rapidly, close during placement and verify no other window moves. Open the mode dropdown and press Escape: only the dropdown should close first. Repeatedly open in floating mode and confirm there is no initial tiled frame or desktop reflow; repeat after reloading Hyprland.
 
 The upstream PR is still open. Closing or superseding it is a separate action after the independent plugin is accepted; migration is optional for users who want their older settings.
+
+## v0.1.0 release preparation
+
+The release preparation PR changes documentation and contribution templates only. Runtime source remains the hardened candidate `aa476b512763188387d638f45cac165176fe61e0`. The full portable suite is rerun on the preparation branch; the PR head and its CI run identify that candidate. The final release SHA will be the merged commit, recorded before tagging.
+
+Marketplace issue [#8069](https://github.com/omacom/omarchy-plugin-marketplace/issues/8069) reports successful Quattro compatibility and automated security baseline checks for `aa476b512763188387d638f45cac165176fe61e0`. This corroborates the supported multiselect schema despite the older local skill's preflight warning. It does not establish approval or validate newer commits.
