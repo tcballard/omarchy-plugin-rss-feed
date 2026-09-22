@@ -19,6 +19,10 @@ The reader's QML, Python fetcher, feed catalogue, JavaScript models and seven or
 
 The complete portable output is in `test-results.txt`. Source test assertions for a built-in shell colour property and a core-owned global binding were removed because those responsibilities now belong to the plugin palette and the user's shortcut. Other inherited assertions were retained with paths and the plugin ID updated.
 
+The window-mode follow-up adds nine Python tests for exact PID/title/address targeting, explicit tile/float commands, monitor sizing, bounded mapping retries and dispatch failure; a JavaScript lifecycle test exercises hidden/open/close scheduling and settings preservation. The helper is a short-lived child of the hosting Quickshell process and only dispatches against its own matching RSS Feed window address. It never falls back to the active window. Closing cancels queued and running placement work; changes during a running operation queue the latest preference.
+
+Dispatcher syntax follows the [Hyprland Lua examples](https://wiki.hypr.land/configuring/code-snippets/) and the targeted window dispatch pattern in Omarchy's `omarchy-hyprland-window-pop` at the recorded host revision. Placement does not edit Hyprland rules or global configuration.
+
 ## On-device checks still required
 
 The original PR body reports live desktop testing of the original reader. That is not evidence that the extracted plugin has passed on-device testing. No Qt/Quickshell compositor was available for this extraction; QML compilation, visual comparison and the following lifecycle checks remain unrun:
@@ -31,5 +35,6 @@ The original PR body reports live desktop testing of the original reader. That i
 6. Switch themes, including themes with missing category colours; verify fresh palette values and readable controls.
 7. Install the shortcut, confirm it appears under Super + K and toggles RSS Feed, verify conflicts are refused, rerun setup, remove it and verify other bindings remain unchanged.
 8. Disable during refresh, re-enable, update from Git once published, then remove; confirm processes stop and retained user data remains intact.
+9. Select **F → Window mode → Centred floating** while open, switch back to Tiled, close/reopen, and restart the shell. Confirm the preference persists, only RSS Feed moves, and centring/sizing works on each monitor, including scaling and rotation. Change mode rapidly, close during placement and verify no other window moves. Open the mode dropdown and press Escape: only the dropdown should close first.
 
 The upstream PR is still open. Close or supersede it only after the standalone repository is available and the on-device migration passes.

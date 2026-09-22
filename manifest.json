@@ -25,9 +25,21 @@
     "defaultSection": "right",
     "defaults": {
       "refreshIntervalMin": 15,
-      "itemLimit": 10
+      "itemLimit": 10,
+      "windowMode": "Tiled"
     },
     "schema": [
+      {
+        "key": "windowMode",
+        "type": "enum",
+        "label": "Window mode",
+        "options": [
+          "Tiled",
+          "Centred floating"
+        ],
+        "defaultValue": "Tiled",
+        "description": "Choose a tiled reader or a centred floating window. Applies immediately while open and is remembered."
+      },
       {
         "key": "refreshIntervalMin",
         "type": "integer",

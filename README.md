@@ -9,6 +9,7 @@ This is the reader originally built in [Omarchy PR #10012](https://github.com/om
 - Feed management and named collections inside the reader.
 - Unread tracking, cached articles for offline reading, and background refresh.
 - Theme colours, clickable article links, and an action to open the original story.
+- Choose a tiled reader or a centred floating window; RSS Feed remembers your choice.
 
 ## Install
 
@@ -22,6 +23,8 @@ python3 ~/.config/omarchy/plugins/io.github.tcballard.rss-feed/scripts/keybindin
 Already using the original reader? Follow [migration](docs/installation.md) before enabling this plugin to keep your subscriptions, collections, placement, unread history and caches.
 
 Press **Super + Alt + N** or click the RSS icon to open RSS Feed. Right-click the icon to refresh. Inside, **F** manages feeds, **R** refreshes, **O** opens the original article, and **Esc** returns or closes. [All keyboard and mouse controls →](docs/keybindings.md)
+
+For a pop-out reader, press **F** and set **Window mode → Centred floating**. It applies immediately and stays selected after a restart. Choose **Tiled** to put the reader back into your layout.
 
 ## Development
 

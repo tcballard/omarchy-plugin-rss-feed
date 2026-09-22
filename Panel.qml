@@ -3,6 +3,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell
+import Quickshell.Io
 import qs.Commons
 import qs.Ui
 
@@ -19,6 +20,19 @@ Item {
   property string focusArea: "headlines"
   property var currentArticle: null
   property bool managingFeeds: false
+  property bool windowModePending: false
+  property string windowModeError: ""
+  readonly property string windowMode: news ? news.windowMode : "Tiled"
+  readonly property string windowModeHelper: decodeURIComponent(Qt.resolvedUrl("window_mode.py").toString().replace(/^file:\/\//, ""))
+
+  onWindowModeChanged: requestWindowMode()
+
+  function requestWindowMode() {
+    if (!opened) return
+    windowModeError = ""
+    windowModePending = true
+    windowModeTimer.restart()
+  }
 
   readonly property var news: service
   readonly property var articles: news ? news.itemsForSource(selectedSourceId) : []
@@ -41,11 +55,16 @@ Item {
     if (!currentArticle && articles.length > 0) currentArticle = articles[selectedIndex]
     if (news && news.items.length === 0 && !news.refreshing) news.refresh(true)
     markReadTimer.restart()
+    requestWindowMode()
     Qt.callLater(function() { focusScope.forceActiveFocus() })
   }
 
   function close() {
     markReadTimer.stop()
+    feedManager.dismissPopup()
+    windowModeTimer.stop()
+    windowModePending = false
+    windowModeProcess.running = false
     closingFromHost = true
     opened = false
     window.visible = false
@@ -65,6 +84,7 @@ Item {
   }
 
   function closeFeedManager() {
+    feedManager.dismissPopup()
     managingFeeds = false
     markReadTimer.restart()
     focusArea = "headlines"
@@ -156,6 +176,7 @@ Item {
   }
 
   function statusLabel() {
+    if (windowModeError !== "") return "WINDOW MODE COULD NOT BE APPLIED · CHECK SETTINGS"
     if (!news) return "LOADING NEWS SERVICE"
     if (news.refreshing && news.items.length === 0) return "CHECKING FOR NEWS"
     if (news.configurationError !== "") return "CHECK CUSTOM FEED SETTINGS"
@@ -202,6 +223,32 @@ Item {
   }
 
   Timer {
+    id: windowModeTimer
+    interval: 80
+    onTriggered: {
+      if (!root.opened || windowModeProcess.running) return
+      root.windowModePending = false
+      windowModeProcess.command = ["python3", root.windowModeHelper, root.windowMode]
+      windowModeProcess.running = true
+    }
+  }
+
+  Process {
+    id: windowModeProcess
+    running: false
+    stderr: StdioCollector { id: windowModeStderr; waitForEnd: true }
+    onExited: function(exitCode) {
+      if (!root.opened) return
+      if (root.windowModePending) {
+        windowModeTimer.restart()
+      } else if (exitCode !== 0) {
+        root.windowModeError = "Window mode could not be applied. Close and reopen RSS Feed to retry."
+        console.warn("RSS Feed window mode:", windowModeStderr.text)
+      }
+    }
+  }
+
+  Timer {
     id: markReadTimer
     interval: 1200
     repeat: false
@@ -239,7 +286,7 @@ Item {
       Keys.onPressed: function(event) {
         if (root.managingFeeds) {
           if (event.key === Qt.Key_Escape) {
-            root.closeFeedManager()
+            if (!feedManager.dismissPopup()) root.closeFeedManager()
             event.accepted = true
           }
           return
@@ -308,7 +355,7 @@ Item {
             spacing: Style.space(2)
 
             Text {
-              text: "RSS READER"
+              text: "RSS FEED"
               color: root.foreground
               font.family: root.fontFamily
               font.pixelSize: Style.font.iconLarge
@@ -319,7 +366,7 @@ Item {
             Text {
               textFormat: Text.PlainText
               text: root.managingFeeds ? "CHOOSE WHAT BELONGS IN YOUR FEED" : root.statusLabel()
-              color: root.news && (root.news.stale || root.news.partial) ? root.urgent : root.dim
+              color: root.windowModeError !== "" || (root.news && (root.news.stale || root.news.partial)) ? root.urgent : root.dim
               font.family: root.fontFamily
               font.pixelSize: Style.font.caption
               font.bold: true
@@ -377,6 +424,7 @@ Item {
           Layout.fillWidth: true
           Layout.fillHeight: true
           news: root.news
+          windowModeError: root.windowModeError
           shell: root.shell
           fontFamily: root.fontFamily
           foreground: root.foreground

@@ -64,10 +64,10 @@ ok - read history is bounded
 ok - read IDs survive restart
 ok - Atom text, XHTML, inherited bases and safe relative links
 ok - shortened articles show a notice outside links, without flagging exact limits or stripped content
-rss-reader-perf sources=21 items=210 cold_ms=108.8 warm_ms=31.1 payload_kib=4994.6
+rss-reader-perf sources=21 items=210 cold_ms=102.5 warm_ms=28.0 payload_kib=4994.6
 ok - RSS Feed cold and warm paths stay within bounded performance budgets
 ok - RSS Feed warm cache performs zero network fetches at the 21-source ceiling
-rss-reader-collections sources=21 items=210 groups=8 rebuilds=1000 elapsed_ms=20.4
+rss-reader-collections sources=21 items=210 groups=8 rebuilds=1000 elapsed_ms=20.1
 ok - RSS Feed collection indexing stays within its bounded performance budget
 ok - invalid cache timestamps cannot abort refresh
 ok - cache write failures preserve freshly fetched articles
@@ -87,6 +87,17 @@ ok - fresh cache is labelled cached
 ok - successful fetch is live
 ok - failed refresh retains cached state
 ok - failed first fetch is an error
+ok - hidden reader does not schedule window operations
+ok - mode changes queue application and clear old errors
+ok - open reader schedules window-mode application
+ok - closing cancels pending and running placement work and hides the reader
+ok - closing stops the placement timer
+ok - closing also dismisses the window-mode dropdown
+ok - window-mode preference is persisted under this plugin
+ok - floating preference reaches persistent shell settings
+ok - window-mode change preserves subscriptions
+ok - window-mode change preserves collections
+ok - returning to tiled replaces the saved preference
 .....
 ----------------------------------------------------------------------
 Ran 5 tests in 0.001s
@@ -95,5 +106,10 @@ OK
 .........
 ----------------------------------------------------------------------
 Ran 9 tests in 0.002s
+
+OK
+.........
+----------------------------------------------------------------------
+Ran 9 tests in 0.001s
 
 OK

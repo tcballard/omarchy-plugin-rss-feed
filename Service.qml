@@ -32,6 +32,7 @@ Item {
   readonly property string statePath: stateDir + "/read.json"
   readonly property int refreshIntervalMin: intSetting("refreshIntervalMin", 15, 5, 120)
   readonly property int itemLimit: intSetting("itemLimit", 10, 5, 20)
+  readonly property string windowMode: setting("windowMode", "Tiled") === "Centred floating" ? "Centred floating" : "Tiled"
   readonly property var techFeedIds: FeedCatalog.techFeedIds
   readonly property var feedCatalog: FeedCatalog.feeds
   readonly property var enabledFeedIds: listSetting("enabledFeeds")

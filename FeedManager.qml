@@ -18,6 +18,7 @@ Item {
   property int editingIndex: -1
   property string formError: ""
   property bool showingCollections: false
+  property string windowModeError: ""
 
   readonly property var catalog: news ? news.feedCatalog : []
   readonly property var enabledFeedIds: news ? news.enabledFeedIds : []
@@ -242,6 +243,12 @@ Item {
     activate()
   }
 
+  function dismissPopup() {
+    if (!windowModeDropdown.popupOpen) return false
+    windowModeDropdown.close()
+    return true
+  }
+
   Keys.onEscapePressed: {
     root.done()
   }
@@ -249,6 +256,43 @@ Item {
   ColumnLayout {
     anchors.fill: parent
     spacing: Style.space(12)
+
+    RowLayout {
+      Layout.fillWidth: true
+      spacing: Style.space(12)
+
+      Text {
+        text: "WINDOW MODE"
+        color: root.foreground
+        font.family: root.fontFamily
+        font.pixelSize: Style.font.caption
+        font.bold: true
+      }
+
+      Dropdown {
+        id: windowModeDropdown
+        label: "Window mode"
+        showLabel: false
+        options: ["Tiled", "Centred floating"]
+        value: root.news ? root.news.windowMode : "Tiled"
+        foreground: root.foreground
+        accent: root.accent
+        fontFamily: root.fontFamily
+        onChanged: function(value) { root.persistSettings({ "windowMode": value }) }
+      }
+
+      Item { Layout.fillWidth: true }
+    }
+
+    Text {
+      Layout.fillWidth: true
+      visible: root.windowModeError !== ""
+      text: root.windowModeError
+      wrapMode: Text.WordWrap
+      color: root.urgent
+      font.family: root.fontFamily
+      font.pixelSize: Style.font.caption
+    }
 
     BorderSurface {
       Layout.fillWidth: true
