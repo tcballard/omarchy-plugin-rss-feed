@@ -1,0 +1,11 @@
+#!/bin/bash
+set -euo pipefail
+ROOT=$(cd -- "$(dirname -- "$0")/.." && pwd)
+export PYTHONDONTWRITEBYTECODE=1
+bash "$ROOT/agents/validate-plugin.sh" "$ROOT"
+for test_file in "$ROOT"/test/shell.d/*-test.sh; do
+  [[ $test_file == */base-test.sh ]] && continue
+  bash "$test_file"
+done
+python3 "$ROOT/test/migration_test.py"
+python3 "$ROOT/test/keybindings_test.py"

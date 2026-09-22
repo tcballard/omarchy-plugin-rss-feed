@@ -1,0 +1,132 @@
+{
+  "generatedAt": "2026-09-22T05:20:35.253Z",
+  "source": "https://omarchyplugins.com/catalog.json",
+  "listings": [
+    {
+      "id": "io.github.rafaelvzago.rss",
+      "name": "RSS",
+      "description": "Recent posts from RSS 2.0 feeds, with an unread count on the Omarchy bar.",
+      "repo": "https://github.com/rafaelvzago/omarchy-rss-plugin",
+      "version": "0.1.0",
+      "verificationCoverage": "snapshot-verified",
+      "upstreamObservedCommit": "57295d660995b75ee3e3b5afc128e676a5cf4fe8"
+    },
+    {
+      "id": "io.github.sanjyay.rss-reeder",
+      "name": "RSS-Reeder",
+      "description": "Native RSS and Atom reader for the Omarchy bar with OPML, categories, search, unread tracking, and configurable retention.",
+      "repo": "https://github.com/sanjyay/rss-reeder",
+      "version": "0.1.0",
+      "verificationCoverage": "update-unverified",
+      "upstreamObservedCommit": "79db89ef83434f2dfe633c60fe68d116e02f7e26"
+    },
+    {
+      "id": "io.github.alejandro-llanes.news",
+      "name": "News",
+      "description": "A news reader in the bar. Hacker News out of the box, any RSS/Atom feed you add, with article artwork, bookmarks, and a cache you control.",
+      "repo": "https://github.com/alejandro-llanes/omarchy-news",
+      "version": "1.0.3",
+      "verificationCoverage": "snapshot-verified",
+      "upstreamObservedCommit": "05a5d646d453ae14617aeb1c5dcfce1ef57a906d"
+    },
+    {
+      "id": "com.flaviomedeiros.rss.headlines",
+      "name": "RSS Headlines",
+      "description": "RSS headlines in the Menu Bar, powered by Newsboat.",
+      "repo": "https://github.com/flaviomedeiros/rssheadlines",
+      "version": "1.0.2",
+      "verificationCoverage": "snapshot-verified",
+      "upstreamObservedCommit": "166bd57bf386fbad59131bd1d715c8489c319851"
+    },
+    {
+      "id": "io.github.kitsunesemcalda.feader-rss",
+      "name": "Feader RSS",
+      "description": "Persistent RSS reader for the Omarchy shell.",
+      "repo": "https://github.com/KitsuneSemCalda/Feader-RSS",
+      "version": "0.3.4",
+      "verificationCoverage": "update-unverified",
+      "upstreamObservedCommit": "4b9689be0337384434ad35a71f80dfec60d49b38"
+    },
+    {
+      "id": "sinannar.omarchy.plugin.msftdevblogs",
+      "name": "Microsoft Dev Blogs",
+      "description": "Recent posts from the Microsoft for Developers RSS feed, with a panel to browse and open them",
+      "repo": "https://github.com/sinannar/sinannar.omarchy.plugin.msftdevblogs",
+      "version": "1.0.0",
+      "verificationCoverage": "snapshot-verified",
+      "upstreamObservedCommit": "e39954458f0c822e759bb4f72ae3facd5b826575"
+    },
+    {
+      "id": "ranjithraj.news-reader",
+      "name": "News Reader",
+      "description": "Fullscreen overlay RSS news reader \u2014 bring your own RSS/Atom feeds, search, filter by source, and open stories in your browser. No hard-coded feeds or articles; configure via Settings or import OPML/JSON. Summon from the bar or with omarchy-shell shell summon.",
+      "repo": "https://github.com/ranjithrajv/news-reader",
+      "version": "0.2.0",
+      "verificationCoverage": "update-unverified",
+      "upstreamObservedCommit": "bcb495b19d2bba3a4dc466801438b2ed8dfd6b68"
+    },
+    {
+      "id": "synapsync.news-feed",
+      "name": "News Feed",
+      "description": "Read headlines from an RSS news feed, Yahoo Finance by default, from the bar.",
+      "repo": "https://github.com/joisephdev/omarchy-news-feed",
+      "version": "1.3.0",
+      "verificationCoverage": "snapshot-verified",
+      "upstreamObservedCommit": "418c58dcb801b4161e1c9b691b5eeed15f0c7ee8"
+    },
+    {
+      "id": "mghizdavet.rss",
+      "name": "RSS news",
+      "description": "An RSS reader in the Omarchy bar: the unread count, the items in a panel, mark-all-read, and feed management. Speaks 10 languages, following the system locale by default.",
+      "repo": "https://github.com/MariusGhizdavet/omarchy-rss",
+      "version": "1.1.1",
+      "verificationCoverage": "snapshot-verified",
+      "upstreamObservedCommit": "f4b3dade904e01895911af1f224cf9c1a08ab0bd"
+    },
+    {
+      "id": "io.github.shirak-semonian.newsflash",
+      "name": "NewsFlash",
+      "description": "Daily world news in a minimalist bar widget. One-time IP geolocation opens the edition of the country you are in (190+ countries; localized sections, English search feed elsewhere). Lead story with optional image over a compact list with LIVE markers and relative times. Click a headline to read the full article inside the panel (local extraction). Read-aloud in the edition's own language (edge-tts). Quiet polling (5-60 min) via Google News RSS with BBC/Guardian fallback. No key, no tracking.",
+      "repo": "https://github.com/Shirak-Semonian/newsflash-omarchy-plugin",
+      "version": "0.6.0",
+      "verificationCoverage": "snapshot-verified",
+      "upstreamObservedCommit": "e66ecef86855d8cc1daf6fe84e7016e286fe9341"
+    },
+    {
+      "id": "io.github.keegan-sucks.rss-feeder",
+      "name": "RSS-Feeder",
+      "description": "Native RSS and Atom reader for the Omarchy bar with OPML, per-feed category editing, YouTube Shorts filtering, search, unread tracking, and configurable retention.",
+      "repo": "https://github.com/keegan-sucks/rss-feeder",
+      "version": "0.2.2",
+      "verificationCoverage": "update-unverified",
+      "upstreamObservedCommit": "221b383ca8b8bccc0a0d7a883beb7121a03e6330"
+    },
+    {
+      "id": "io.github.siygle.omarchy-rss-client",
+      "name": "Omarchy RSS Client",
+      "description": "Built on sanjyay/rss-reeder, adding more RSS client features and bug fixes.",
+      "repo": "https://github.com/siygle/omarchy-rss-client",
+      "version": "0.1.0",
+      "verificationCoverage": "update-unverified",
+      "upstreamObservedCommit": "38b6685541a7aab410a6f9a648d291e21aad3e45"
+    },
+    {
+      "id": "ozdil.omarss",
+      "name": "OmaRSS",
+      "description": "Ultra-fast, native, lightweight RSS & Atom feed reader and notification hub for Omarchy written in Rust.",
+      "repo": "https://github.com/ozdil/omarchy-omarss",
+      "version": "1.0.0",
+      "verificationCoverage": "snapshot-verified",
+      "upstreamObservedCommit": "d0ce844fe6fa7fe9a4640d8f39062ce41cef710a"
+    },
+    {
+      "id": "shaggyrs6.briefing",
+      "name": "Omarchy Briefing",
+      "description": "Completed package changes and a quiet, source-labelled Omarchy news reader",
+      "repo": "https://github.com/shaggyrs6-netizen/omarchy-briefing",
+      "version": "0.1.0",
+      "verificationCoverage": "snapshot-verified",
+      "upstreamObservedCommit": "b908963a6fc07cd140c7e2d0c09360f48d29290e"
+    }
+  ]
+}

@@ -1,0 +1,99 @@
+{"author": "DHH", "content": "First paragraph with an inline link.\n\nSecond paragraph.\n\n\u2022 First point\n\n\u2022 Second point", "contentHtml": "First paragraph with an <a href=\"https://example.com\">inline link</a>.<br>Second paragraph.<br>\u2022 First point<br>\u2022 Second point", "id": "omarchy:https://omarchy.org/news/2026/09/a-new-thing", "published": "Thu, 03 Sep 2026 00:00:00 GMT", "sourceCategory": "official", "sourceId": "omarchy", "sourceName": "Omarchy", "sourceUrl": "https://omarchy.org/news/rss.xml", "summary": "One useful sentence.", "title": "A new Omarchy thing", "url": "https://omarchy.org/news/2026/09/a-new-thing"}
+ok - RSS collections sanitize persisted groups and discard unsafe sources
+ok - RSS collections recover from malformed settings
+ok - RSS aggregate keeps the configured article ceiling
+ok - RSS source lookup stays bounded and indexed
+ok - RSS collections aggregate selected source URLs in feed order
+ok - RSS collections expose an empty indexed stream when no selected feed has items
+ok - news feed parser accepts canonical items from curated sources
+ok - news plugin manifest pairs the bar widget with a multi-source desktop reader
+ok - news reader manages curated and custom feeds inside the panel
+ok - news fetcher pins and bounds curated feeds and ignores environment redirection
+ok - helper resolves beside installed plugin, including spaces and escaped characters
+ok - reader palette accepts semantic theme colours
+ok - reader palette preserves ANSI fallback colours
+ok - theme changes clear colours absent from the next theme
+ok - invalid palette values use shell colour fallbacks
+ok - Panel.qml targets the independent plugin ID
+ok - BarWidget.qml targets the independent plugin ID
+ok - FeedManager.qml targets the independent plugin ID
+ok - new readers always include curated Omarchy
+ok - empty saved settings cannot remove curated Omarchy
+ok - curated Omarchy survives malformed settings
+ok - saved settings cannot rename or replace curated Omarchy sources
+ok - previous starter collection is replaced by curated Omarchy
+ok - curated Omarchy excludes unrelated publisher news
+ok - collection-only feed stays subscribed after reload
+ok - collection-only feeds have no individual tabs
+ok - standalone and collection subscriptions are deduplicated
+ok - removing the final collection stops an otherwise disabled feed
+ok - custom tab can be hidden independently
+ok - hidden custom tab can be restored
+ok - hiding a tab preserves its collection articles
+ok - All still includes collection-only articles
+ok - persistence fixture exceeds the former destructive truncation boundary
+ok - all eight large collections survive serialization and reload
+ok - service passes complete collection JSON to the bounded parser
+ok - removing the final subscription preserves the named collection
+ok - empty collections survive restarting the reader
+ok - membership updates do not mutate the original settings
+ok - URL replacement deduplicates collection membership
+ok - valid IDs cannot collide with inherited JavaScript properties
+ok - source indexing safely handles reserved object keys
+ok - oversized settings are rejected before parsing
+ok - catalogue drives Python and generated metadata; generation is deterministic and check-only
+ok - stale outputs and invalid feed policies fail; hand-authored manifest settings survive
+ok - official feed metadata comes from the catalogue
+ok - generated JavaScript preserves publisher order and metadata
+ok - tech pack membership comes from the catalogue
+ok - legacy tech pack selection still works
+ok - optional feeds can be selected independently of tech pack membership
+ok - refresh preserves the reading snapshot while tracking its new list position
+ok - removed article falls back to an available entry
+ok - empty source clears the article
+ok - each accepted edit is submitted for persistence before returning
+ok - successive edits preserve other settings
+ok - later edits do not mutate earlier snapshots
+ok - selected article is read
+ok - other sources remain unread
+ok - other articles remain unread
+ok - revisiting avoids another write
+ok - legacy older articles remain read
+ok - legacy newer articles remain unread
+ok - read history is bounded
+ok - read IDs survive restart
+ok - Atom text, XHTML, inherited bases and safe relative links
+ok - shortened articles show a notice outside links, without flagging exact limits or stripped content
+rss-reader-perf sources=21 items=210 cold_ms=108.8 warm_ms=31.1 payload_kib=4994.6
+ok - RSS Feed cold and warm paths stay within bounded performance budgets
+ok - RSS Feed warm cache performs zero network fetches at the 21-source ceiling
+rss-reader-collections sources=21 items=210 groups=8 rebuilds=1000 elapsed_ms=20.4
+ok - RSS Feed collection indexing stays within its bounded performance budget
+ok - invalid cache timestamps cannot abort refresh
+ok - cache write failures preserve freshly fetched articles
+ok - offline refresh preserves cached articles with a stale indicator
+ok - invalid cache encoding is treated as a cache miss
+ok - redirect handler rejects unsafe targets and excessive hops
+ok - closing the reader cancels pending automatic read acknowledgement
+ok - managing subscriptions cancels pending read acknowledgement
+ok - read timer checks that the reader is actually visible
+ok - cached articles emit before fetching and fast feeds bypass slow feeds
+ok - total feed failure retains structured source errors
+ok - streamed sources stay checking until resolved, with offline state only after failure
+ok - unresolved feeds are not live
+ok - first fetch is checking
+ok - cached snapshot is checking
+ok - fresh cache is labelled cached
+ok - successful fetch is live
+ok - failed refresh retains cached state
+ok - failed first fetch is an error
+.....
+----------------------------------------------------------------------
+Ran 5 tests in 0.001s
+
+OK
+.........
+----------------------------------------------------------------------
+Ran 9 tests in 0.002s
+
+OK

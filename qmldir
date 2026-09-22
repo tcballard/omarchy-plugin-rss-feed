@@ -1,0 +1,6 @@
+singleton ReaderPalette 1.0 ReaderPalette.qml
+BarWidget 1.0 BarWidget.qml
+CollectionManager 1.0 CollectionManager.qml
+FeedManager 1.0 FeedManager.qml
+Panel 1.0 Panel.qml
+Service 1.0 Service.qml

@@ -1,0 +1,10 @@
+{
+  "extracted_at": "2026-09-22",
+  "source_repository": "https://github.com/tcballard/omarchy",
+  "source_branch": "feat/omarchy-news-panel",
+  "source_commit": "21e7913a10d6334428eaf4a066365d77c6858568",
+  "source_pr": "https://github.com/omacom/omarchy/pull/10012",
+  "host_repository": "https://github.com/omacom/omarchy",
+  "host_branch": "quattro",
+  "host_commit": "947e2fc002d6831c7888b29b5761d59d29e69727"
+}
