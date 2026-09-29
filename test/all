@@ -2,6 +2,7 @@
 set -euo pipefail
 ROOT=$(cd -- "$(dirname -- "$0")/.." && pwd)
 export PYTHONDONTWRITEBYTECODE=1
+node "$ROOT/test/perch_card_test.cjs"
 bash "$ROOT/agents/validate-plugin.sh" "$ROOT"
 for test_file in "$ROOT"/test/shell.d/*-test.sh; do
   [[ $test_file == */base-test.sh ]] && continue

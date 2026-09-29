@@ -4,6 +4,7 @@ import Quickshell.Io
 import "Collections.js" as Collections
 import "FeedCatalog.js" as FeedCatalog
 import "ReadState.js" as ReadState
+import "PerchCard.js" as PerchCard
 
 Item {
   id: root
@@ -48,6 +49,25 @@ Item {
   readonly property var collectionFilters: buildCollectionFilters()
   readonly property string sourceConfigSignature: enabledSourceIds.join(",") + "|" + customFeeds
   readonly property int unreadCount: countUnread()
+
+  // Read-only snapshots reuse the existing service. No extra feed fetcher,
+  // window, timer or settings ownership is introduced by Perch.
+  IpcHandler {
+    target: "io.github.tcballard.rss-feed"
+    function perchCard(): string {
+      return JSON.stringify(PerchCard.card(root))
+    }
+    function perchAction(request: string): string {
+      var action = PerchCard.resolve(root, request)
+      if (!action) return JSON.stringify({ok: false})
+      if (action.kind === "refresh") root.refresh()
+      else {
+        if (!Qt.openUrlExternally(String(action.article.url))) return JSON.stringify({ok: false})
+        root.markArticleSeen(action.article)
+      }
+      return JSON.stringify({ok: true})
+    }
+  }
 
   onSourceConfigSignatureChanged: if (stateLoaded) configurationRefreshTimer.restart()
   onCollectionsChanged: rebuildItemIndex()

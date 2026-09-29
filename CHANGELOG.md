@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Expose an optional native Perch card with unread status, bounded headlines,
+  refresh and read actions from the existing service. Validate snapshot revisions
+  and resolve article URLs locally before acting. No new poller or window.
+
 ## 0.1.0 — 22 September 2026
 
 - Extract the existing RSS reader into an independent Omarchy Quattro plugin, named RSS Feed.

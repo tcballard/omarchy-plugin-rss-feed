@@ -62,6 +62,13 @@ Removal keeps your cached articles and reading history. See [installation and re
 
 ## A few useful details
 
+**Unreleased Perch integration:** the paired Perch native-drawer change can show
+RSS headlines and unread status inside Perch. Pin RSS Feed there, then use
+Refresh feeds or Read article; Open still launches this full reader. Snapshots
+reuse this plugin's existing service and add no polling. The reader owns article
+URL validation, read state and feed refreshes. This optional integration leaves
+standalone RSS behaviour intact and still needs live Omarchy acceptance.
+
 Feeds come directly from their publishers. No analytics, accounts or tracking service. Custom subscriptions need public HTTPS URLs; private-network and authenticated feeds aren't supported. Subscription URLs and cached articles are stored locally in plain text. [Privacy and dependencies →](docs/security.md)
 
 **v0.1.0** is [available in the Omarchy Plugin Store](https://plugins.omarchy.org/plugin.html?id=io.github.tcballard.rss-feed). All on-device release checks passed on my XPS. [Validation details →](docs/validation.md)

@@ -1,0 +1,16 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),crypto=require('node:crypto');
+const c={Qt:{md5:s=>crypto.createHash('md5').update(s).digest('hex')}};
+vm.createContext(c);vm.runInContext(fs.readFileSync(require('node:path').join(__dirname,'../PerchCard.js'),'utf8'),c);
+const item={id:'a',title:'One',url:'https://example.com/1',sourceName:'Example'};
+const news={itemsForSource:()=>[item],readIds:[],unreadCount:1,fetchedAt:'now',refreshing:false,lastError:'',configurationError:'',stale:false,partial:false};
+let card=c.card(news);assert.equal(card.rows.length,1);assert.equal(card.status,'ready');
+const request=action=>JSON.stringify({version:1,revision:card.revision,action});
+assert.equal(c.resolve(news,request('open:0')).article,item);
+assert.equal(c.resolve(news,request('refresh')).kind,'refresh');
+for(const raw of ['{bad','x'.repeat(1025),request('open:9'),request('shell:bad')]) assert.equal(c.resolve(news,raw),null);
+item.url='https://example.com/changed';assert.equal(c.resolve(news,request('open:0')),null);
+card=c.card(news);news.readIds=['a'];assert.equal(c.resolve(news,request('open:0')),null);
+news.refreshing=true;card=c.card(news);assert.equal(card.status,'loading');assert.equal(c.resolve(news,request('refresh')),null);
+news.refreshing=false;item.url='file:///tmp/private';card=c.card(news);assert.equal(card.rows[0].action,null);assert.equal(c.resolve(news,request('open:0')),null);
+news.itemsForSource=()=>[];assert.equal(c.card(news).status,'empty');news.lastError='offline';assert.equal(c.card(news).status,'error');
+console.log('RSS Perch card: snapshots, stale revisions, URL ownership, empty/error/loading passed.');
